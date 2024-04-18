@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: authores
+  labels:
+    name: authores
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 100m
+    kubernetes.io/tls-acme: "true"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  tls:
+  - hosts:
+    - api-eu.dev.itechopscloud.com
+    secretName: api-eu.dev-authores-itechopscloud-tls
+  rules:
+    - host: api-eu.dev.itechopscloud.com
+      http:
+        paths:
+          - pathType: Prefix
+            path: /v2/author(/|$)(.*)
+            backend:
+              service:
+                name: authores-api
+                port:
+                  number: 80

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: authores-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authores-api
+  template:
+    metadata:
+      labels:
+        app: authores-api
+    spec:
+      imagePullSecrets:
+        - name: itechops-docker-registry-secret
+      containers:
+        - name: producer
+          imagePullPolicy: Always
+          image: itechops.azurecr.io/authores-producer:latest
+          resources:
+            limits:
+              cpu: "800m"
+              memory: 1Gi
+            requests:
+              cpu: "100m"
+              memory: 200Mi
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+        - name: consumer
+          imagePullPolicy: Always
+          stdin: true
+          image: itechops.azurecr.io/authores-consumer:latest
+          resources:
+            limits:
+              cpu: "800m"
+              memory: 1Gi
+            requests:
+              cpu: "100m"
+              memory: 200Mi
+
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: authores-api
+spec:
+  selector:
+    app: authores-api
+  ports:
+    - name: http
+      port: 80
+    - name: https
+      port: 443

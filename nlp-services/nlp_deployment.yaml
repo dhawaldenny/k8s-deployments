@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nlp-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nlp-api
+  template:
+    metadata:
+      labels:
+        app: nlp-api
+    spec:
+      imagePullSecrets:
+        - name: itechops-docker-registry-secret
+      containers:
+        - name: web
+          imagePullPolicy: Always
+          stdin: true
+          image: itechops.azurecr.io/nlp-api:latest
+          ports:
+            - containerPort: 5000
+          resources:
+            limits:
+              cpu: "800m"
+              memory: 1Gi
+            requests:
+              cpu: "100m"
+              memory: 200Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nlp-api
+spec:
+  selector:
+    app: nlp-api
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000
+    - name: https
+      port: 443
+      targetPort: 5000
+

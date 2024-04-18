@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+        - name: redis
+          imagePullPolicy: Always
+          stdin: true
+          image: redis/redis-stack-server:latest
+          ports:
+            - containerPort: 6379
+          resources:
+            limits:
+              cpu: "800m"
+              memory: 1Gi
+            requests:
+              cpu: "100m"
+              memory: 200Mi
+---              
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+spec:
+  selector:
+    app: redis
+  ports:
+    - name: http
+      port: 6379
+      targetPort: 6379
